@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_exit"
+        android:orderInCategory="100"
+        android:title="@string/menu_exit"/>
+    <item android:id="@+id/menu_refresh" android:orderInCategory="100" android:title="@string/menu_refresh"></item>
+    
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+
+</menu>
