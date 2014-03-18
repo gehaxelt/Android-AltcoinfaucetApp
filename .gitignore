@@ -28,3 +28,11 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
+
+#Other files
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
