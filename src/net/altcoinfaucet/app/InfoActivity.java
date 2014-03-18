@@ -3,6 +3,7 @@ package net.altcoinfaucet.app;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -49,7 +50,7 @@ public class InfoActivity extends Activity {
 		detailList = new  ArrayList<HashMap<String, String>>();
 		
 		TextView infoTitle = (TextView) findViewById(R.id.info_title);
-		infoTitle.setText(infoFaucet.name + " (" + infoFaucet.shortname + ")" + " - " + "Faucet");
+		infoTitle.setText(infoFaucet.getName() + " (" + infoFaucet.getShortName() + ")" + " - " + "Faucet");
 		
 		this.loadDetailListView();
 		
@@ -84,9 +85,9 @@ public class InfoActivity extends Activity {
     	
     	detailList.clear();
     	
-    	HashMap<String, String> faucetHashMap = infoFaucet.toHashMap();
-    	faucetHashMap.putAll(infoFaucet.stats.toHashMap());
-    	faucetHashMap.putAll(infoFaucet.info.toHashMap());
+    	LinkedHashMap<String, String> faucetHashMap = infoFaucet.toLinkedHashMap();
+    	faucetHashMap.putAll(infoFaucet.getStats().toLinkedHashMap());
+    	faucetHashMap.putAll(infoFaucet.getInfo().toLinkedHashMap());
     	
     	Set<java.util.Map.Entry<String, String>> entrySet = faucetHashMap.entrySet();
     	for( Iterator<java.util.Map.Entry<String, String>> entryIterator = entrySet.iterator(); entryIterator.hasNext();)
@@ -209,12 +210,12 @@ public class InfoActivity extends Activity {
                 	
         	//Update stats
         	ServiceHandler shDetails = new ServiceHandler();
-            String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + infoFaucet.name + "/stats", ServiceHandler.GET);
+            String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + infoFaucet.getName() + "/stats", ServiceHandler.GET);
             
             try {
             	if(jsonDetails != null)
             	{
-            		FaucetStats fStats = infoFaucet.stats;
+            		FaucetStats fStats = infoFaucet.getStats();
             		fStats.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
             		fStats.save();
                 	publishProgress();
@@ -223,13 +224,13 @@ public class InfoActivity extends Activity {
             
         	//Update info
         	ServiceHandler shInfo = new ServiceHandler();
-        	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + infoFaucet.name + "/info", ServiceHandler.GET);
+        	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + infoFaucet.getName() + "/info", ServiceHandler.GET);
         	
         	try {
             	
             	if(jsonInfo != null)
             	{
-            		FaucetInfo fInfo = infoFaucet.info;
+            		FaucetInfo fInfo = infoFaucet.getInfo();
             		fInfo.fromJSONObject(new JSONArray(jsonInfo).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
             		fInfo.save();
             		publishProgress();

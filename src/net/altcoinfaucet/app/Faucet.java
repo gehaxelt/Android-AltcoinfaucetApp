@@ -1,6 +1,7 @@
 package net.altcoinfaucet.app;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.json.JSONException;
@@ -15,21 +16,21 @@ import com.orm.query.Select;
 
 
 public class Faucet extends SugarRecord<Faucet>{
-	int id;
-	String name;
-	String shortname;
-	String slogan;
-	String donate;
-	double balance;
-	double min_payout;
-	double max_payout;
-	double withdraw_limit;
-	double transaction_fee;
-	int timeout;
-	boolean enabled;
-	int state;
-	FaucetStats stats;
-	FaucetInfo info;
+	private int id;
+	private String name;
+	private String shortname;
+	private String slogan;
+	private String donate;
+	private double balance;
+	private double min_payout;
+	private double max_payout;
+	private double withdraw_limit;
+	private double transaction_fee;
+	private int timeout;
+	private boolean enabled;
+	private int state;
+	private FaucetStats stats;
+	private FaucetInfo info;
 		
 	
 	 
@@ -101,8 +102,8 @@ public class Faucet extends SugarRecord<Faucet>{
 	}
 
 	
-	public HashMap<String, String> toHashMap(){
-		HashMap<String, String> map = new HashMap<String, String>();
+	public LinkedHashMap<String, String> toLinkedHashMap(){
+		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		
 		map.put(JSONTag.TAG_DB_ID, String.valueOf(this.getId()));
 		map.put(JSONTag.TAG_ID, String.valueOf(this.id));
@@ -147,6 +148,26 @@ public class Faucet extends SugarRecord<Faucet>{
 			return null;
 		
 		return fList.get(0);
+	}
+
+	public FaucetStats getStats() {
+		// TODO Auto-generated method stub
+		return this.stats;
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return this.name;
+	}
+
+	public FaucetInfo getInfo() {
+		// TODO Auto-generated method stub
+		return this.info;
+	}
+
+	public String getShortName() {
+		// TODO Auto-generated method stub
+		return this.shortname;
 	}
 	
 

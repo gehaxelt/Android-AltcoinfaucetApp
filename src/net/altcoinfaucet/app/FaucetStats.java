@@ -1,6 +1,7 @@
 package net.altcoinfaucet.app;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +12,8 @@ import com.orm.SugarRecord;
 
 public class FaucetStats extends SugarRecord<FaucetStats>{
 
-	int total_payouts;
-	double volume;
+	private int total_payouts;
+	private double volume;
 	
 	public FaucetStats(Context arg0) {
 		super(arg0);
@@ -37,9 +38,9 @@ public class FaucetStats extends SugarRecord<FaucetStats>{
 		}
 	}
 	
-	public HashMap<String, String> toHashMap()
+	public LinkedHashMap<String, String> toLinkedHashMap()
 	{
-		HashMap<String, String> map = new HashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		map.put(JSONTag.TAG_VOLUME, String.valueOf(this.volume));
 		map.put(JSONTag.TAG_TOTAL_PAYOUTS, String.valueOf(this.total_payouts));
 		

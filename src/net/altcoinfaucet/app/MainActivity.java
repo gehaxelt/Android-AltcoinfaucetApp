@@ -51,10 +51,10 @@ public class MainActivity extends ListActivity {
  
         faucetListView = getListView();
         
-        Faucet.deleteAll(Faucet.class);
-        FaucetStats.deleteAll(FaucetStats.class);
-        FaucetInfo.deleteAll(FaucetInfo.class);
-        
+//	    Faucet.deleteAll(Faucet.class);
+//	    FaucetStats.deleteAll(FaucetStats.class);
+//	    FaucetInfo.deleteAll(FaucetInfo.class);
+//	    
         this.loadFromDatabase();
         
         faucetListView.setOnItemClickListener(new OnItemClickListener() {
@@ -104,7 +104,7 @@ public class MainActivity extends ListActivity {
     	{
 	    	for(Faucet faucet : (List<Faucet>) Select.from(Faucet.class).where(new Condition[]{new Condition("state").eq(String.valueOf(i))}).list()  )
 	    	{
-	    		faucetList.add(faucet.toHashMap());
+	    		faucetList.add(faucet.toLinkedHashMap());
 	    	}
     	}
     	
@@ -183,12 +183,12 @@ public class MainActivity extends ListActivity {
                 	
                 	//Update stats
                 	ServiceHandler shDetails = new ServiceHandler();
-                    String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + faucet.name + "/stats", ServiceHandler.GET);
+                    String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + faucet.getName() + "/stats", ServiceHandler.GET);
                     
                     try {
 	                	if(jsonDetails != null)
 	                	{
-	                		FaucetStats fStats = faucet.stats;
+	                		FaucetStats fStats = faucet.getStats();
 	                		fStats.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
 	                		fStats.save();
 	                    	publishProgress();
@@ -197,13 +197,13 @@ public class MainActivity extends ListActivity {
                     
                 	//Update info
                 	ServiceHandler shInfo = new ServiceHandler();
-                	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + faucet.name + "/info", ServiceHandler.GET);
+                	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + faucet.getName() + "/info", ServiceHandler.GET);
                 	
                 	try {
 	                	
 	                	if(jsonInfo != null)
 	                	{
-	                		FaucetInfo fInfo = faucet.info;
+	                		FaucetInfo fInfo = faucet.getInfo();
 	                		fInfo.fromJSONObject(new JSONArray(jsonInfo).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
 	                		fInfo.save();
 	                		publishProgress();
@@ -211,7 +211,7 @@ public class MainActivity extends ListActivity {
                 	} catch(Exception e) {}
 
                 	faucet.save();
-                    faucetList.add(faucet.toHashMap());
+                    faucetList.add(faucet.toLinkedHashMap());
                     
                 	publishProgress();
                 }     
