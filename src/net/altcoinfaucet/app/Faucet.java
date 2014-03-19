@@ -16,7 +16,7 @@ import com.orm.query.Select;
 
 
 public class Faucet extends SugarRecord<Faucet>{
-	private int id;
+	private int faucetId;
 	private String name;
 	private String shortname;
 	private String slogan;
@@ -36,14 +36,21 @@ public class Faucet extends SugarRecord<Faucet>{
 	 
 	public Faucet(Context ctx) {
 		super(ctx);
-		this.stats = new FaucetStats(ctx);
-		this.info = new FaucetInfo(ctx);
 		
+		if(this.stats==null)
+		{
+			this.stats = new FaucetStats(ctx);
+		}
+		
+		if(this.info == null)
+		{
+			this.info = new FaucetInfo(ctx);
+		}
 	}
 	
 	public void fromJSONObj(JSONObject json) throws JSONException
 	{
-		this.id = json.getInt(JSONTag.TAG_ID);
+		this.faucetId = json.getInt(JSONTag.TAG_ID);
 		this.name = json.getString(JSONTag.TAG_NAME).toUpperCase();
 		this.shortname = json.getString(JSONTag.TAG_SHORTNAME);
 		this.slogan = json.getString(JSONTag.TAG_SLOGAN);
@@ -143,7 +150,7 @@ public class Faucet extends SugarRecord<Faucet>{
 	
 	public static Faucet findByFaucetId(long id)
 	{
-		List<Faucet> fList = Faucet.find(Faucet.class, "id = ?",String.valueOf(id));
+		List<Faucet> fList = Faucet.find(Faucet.class, "faucet_Id = ?",String.valueOf(id));
 		if(fList.size()==0)
 			return null;
 		
