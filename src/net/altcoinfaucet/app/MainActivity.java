@@ -3,7 +3,6 @@ package net.altcoinfaucet.app;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,30 +10,23 @@ import org.json.JSONObject;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 public class MainActivity extends ListActivity {
 	 
@@ -131,7 +123,8 @@ public class MainActivity extends ListActivity {
     	}
     }
     
-    @Override
+
+	@Override
     protected void onResume() {
     	// TODO Auto-generated method stub
     	super.onResume();
@@ -242,11 +235,11 @@ public class MainActivity extends ListActivity {
                     
                 	publishProgress();
                 }     
-           
+                httpRequest.destroy();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
- 
+            
             return null;
         }
  
