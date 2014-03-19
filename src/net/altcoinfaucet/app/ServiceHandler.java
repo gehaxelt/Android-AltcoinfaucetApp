@@ -21,6 +21,10 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
  
 public class ServiceHandler {
  
@@ -115,5 +119,16 @@ public class ServiceHandler {
     
     public void destroy() {
     	httpclient.getConnectionManager().shutdown();
+    }
+    
+    //Source: http://stackoverflow.com/questions/2326767/how-do-you-check-the-internet-connection-in-android
+    public boolean isDataAvailable(Context ctx)
+    {
+     ConnectivityManager conxMgr = (ConnectivityManager) ctx.getSystemService(ctx.CONNECTIVITY_SERVICE);
+
+     NetworkInfo mobileNwInfo = conxMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+     NetworkInfo wifiNwInfo   = conxMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+    return ((mobileNwInfo== null? false : mobileNwInfo.isConnected() )|| (wifiNwInfo == null? false : wifiNwInfo.isConnected()));
     }
 }

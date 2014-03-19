@@ -27,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 public class MainActivity extends ListActivity {
 	 
@@ -161,8 +162,14 @@ public class MainActivity extends ListActivity {
         protected Void doInBackground(Void... arg0) {
         	
             ServiceHandler httpRequest = new ServiceHandler();
+            
+            if(!httpRequest.isDataAvailable(mainContext))
+            {
+            	this.showToast("Not internet connection. Update failed.");
+            	return null;
+            }
+            
             String jsonStr = httpRequest.makeServiceCall(apiUrl + "/faucets", ServiceHandler.GET);
-            Log.d("fooo","bar");
  
             if (jsonStr == null) {
             	 Log.e("ServiceHandler", "Couldn't get any data from the url");
@@ -206,6 +213,8 @@ public class MainActivity extends ListActivity {
                 	publishProgress();
                 }     
                 httpRequest.destroy();
+                this.showToast("Update successful!");
+                
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -232,6 +241,7 @@ public class MainActivity extends ListActivity {
         	processDialog.setMessage(currentMessage + String.valueOf(currentIndex) + "/" + String.valueOf(maximumIndex));
         }
         
+        
         @Override
         protected void onCancelled() {
         	// TODO Auto-generated method stub
@@ -243,6 +253,18 @@ public class MainActivity extends ListActivity {
 				public void run() {
 					// TODO Auto-generated method stub
 		        	processDialog.dismiss();	
+				}
+			});
+        }
+        
+        private void showToast(final String text)
+        {
+        	runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+	            	Toast.makeText(mainContext, text, Toast.LENGTH_SHORT).show();
 				}
 			});
         }

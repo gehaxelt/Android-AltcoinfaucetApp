@@ -28,6 +28,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class InfoActivity extends Activity {
 
@@ -236,6 +237,13 @@ public class InfoActivity extends Activity {
             if(isCancelled()) return null;
         	//Update stats
         	ServiceHandler httpRequest = new ServiceHandler();
+        	
+            if(!httpRequest.isDataAvailable(infoContext))
+            {
+            	this.showToast("No internet connection. Update failed.");
+            	return null;
+            }
+            
             String jsonDetails = httpRequest.makeServiceCall(apiUrl + "/faucet/" + infoFaucet.getName() + "/stats", ServiceHandler.GET);
             
             try {
@@ -264,6 +272,7 @@ public class InfoActivity extends Activity {
         	} catch(Exception e) {}
 
         	infoFaucet.save();  
+        	this.showToast("Update successful!");
         	
         	return null;
         }
@@ -305,7 +314,17 @@ public class InfoActivity extends Activity {
 			});
         }
         
-        
+        private void showToast(final String text)
+        {
+        	runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+	            	Toast.makeText(infoContext, text, Toast.LENGTH_SHORT).show();
+				}
+			});
+        }
         
         
 	}
