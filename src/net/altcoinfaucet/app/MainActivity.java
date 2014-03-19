@@ -17,6 +17,7 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -159,6 +160,8 @@ public class MainActivity extends ListActivity {
             processDialog.setMessage("Initialising...");
             processDialog.setCancelable(false);
             processDialog.show();
+            
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         }
  
         @Override
@@ -254,6 +257,8 @@ public class MainActivity extends ListActivity {
             if (processDialog.isShowing())
                 processDialog.dismiss();
             loadFromDatabase();
+            
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
         
         @Override
@@ -280,8 +285,5 @@ public class MainActivity extends ListActivity {
         }
  
     }
-    
-    
-
     
 }

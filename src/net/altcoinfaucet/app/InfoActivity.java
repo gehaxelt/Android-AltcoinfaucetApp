@@ -15,6 +15,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -92,8 +93,16 @@ public class InfoActivity extends Activity {
     	detailList.clear();
     	
     	LinkedHashMap<String, String> faucetHashMap = infoFaucet.toLinkedHashMap();
-    	faucetHashMap.putAll(infoFaucet.getStats().toLinkedHashMap());
-    	faucetHashMap.putAll(infoFaucet.getInfo().toLinkedHashMap());
+    	
+    	if(infoFaucet.getStats()!=null)
+    	{
+    		faucetHashMap.putAll(infoFaucet.getStats().toLinkedHashMap());
+    	}
+    	
+    	if(infoFaucet.getInfo()!=null)
+    	{
+    		faucetHashMap.putAll(infoFaucet.getInfo().toLinkedHashMap());
+    	}
     	
     	Set<java.util.Map.Entry<String, String>> entrySet = faucetHashMap.entrySet();
     	for( Iterator<java.util.Map.Entry<String, String>> entryIterator = entrySet.iterator(); entryIterator.hasNext();)
@@ -213,6 +222,8 @@ public class InfoActivity extends Activity {
             processDialog.setMessage("Initialising...");
             processDialog.setCancelable(false);
             processDialog.show();
+            
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
  
         }
  
@@ -266,6 +277,8 @@ public class InfoActivity extends Activity {
                 processDialog.dismiss();
             
             loadDetailListView();
+            
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
            
         }
         
