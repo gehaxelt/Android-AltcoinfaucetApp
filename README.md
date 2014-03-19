@@ -22,7 +22,7 @@ The app needs two permissions to run correctly:
 
 As I do not have a PlayStore Account yet, you have to download the app using this link:
 
-[Download Altcoinfaucet.net - App here](https://github.com/gehaxelt/Android-AltcoinfaucetApp/blob/dev/build/Altcoinfaucet.apk)
+[Download Altcoinfaucet.net - App here](https://github.com/gehaxelt/Android-AltcoinfaucetApp/blob/master/build/Altcoinfaucet.apk)
 
 
 ###Screenshots
