@@ -53,8 +53,7 @@ public class InfoActivity extends Activity {
 		
 		detailList = new  ArrayList<HashMap<String, String>>();
 		
-		TextView infoTitle = (TextView) findViewById(R.id.info_title);
-		infoTitle.setText(infoFaucet.getName() + " (" + infoFaucet.getShortName() + ")" + " - " + "Faucet");
+		setTitle(infoFaucet.getName() + " (" + infoFaucet.getShortName() + ")" + " - " + "Faucet");
 		
 		this.loadDetailListView();
 		
