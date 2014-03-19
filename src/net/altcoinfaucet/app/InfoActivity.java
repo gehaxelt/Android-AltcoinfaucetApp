@@ -34,8 +34,8 @@ public class InfoActivity extends Activity {
 	Faucet infoFaucet;
 	ListView detailListView;
 	ArrayList<HashMap<String, String>> detailList;
-	ProgressDialog pDialog;
-	GetFaucetDetailsTask aTask;
+	ProgressDialog processDialog;
+	GetFaucetDetailsTask asyncTask;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +77,9 @@ public class InfoActivity extends Activity {
             return true;
             
         case R.id.menu_refresh: //Refresh data
-        	aTask = new GetFaucetDetailsTask();
-        	aTask.execute();
-        	aTask = null;
+        	asyncTask = new GetFaucetDetailsTask();
+        	asyncTask.execute();
+        	asyncTask = null;
             return true;
             
         default:
@@ -99,82 +99,82 @@ public class InfoActivity extends Activity {
     	Set<java.util.Map.Entry<String, String>> entrySet = faucetHashMap.entrySet();
     	for( Iterator<java.util.Map.Entry<String, String>> entryIterator = entrySet.iterator(); entryIterator.hasNext();)
     	{
-    		HashMap<String, String> data = new HashMap<String, String>();
+    		HashMap<String, String> dataPair = new HashMap<String, String>();
     		java.util.Map.Entry<String, String>  entry = entryIterator.next();
     		
     		
     		if(entry.getKey().equals(JSONTag.TAG_BALANCE)) {
     			
-    	   		data.put("setting", "Balance");
-        		data.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));  	   		
+    	   		dataPair.put("setting", "Balance");
+        		dataPair.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));  	   		
     		} else
     		if(entry.getKey().equals(JSONTag.TAG_MIN_PAYOUT))
     		{
-    			data.put("setting", "Min payout");
-        		data.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
+    			dataPair.put("setting", "Min payout");
+        		dataPair.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
 	
     		} else
     		if(entry.getKey().equals(JSONTag.TAG_MAX_PAYOUT))
     		{
-    			data.put("setting", "Max payout");
-        		data.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
+    			dataPair.put("setting", "Max payout");
+        		dataPair.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
 	
     		} else
     		if(entry.getKey().equals(JSONTag.TAG_WITHDRAW_LIMIT))
     		{
-    			data.put("setting", "Withdrawal limit");
-        		data.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
+    			dataPair.put("setting", "Withdrawal limit");
+        		dataPair.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
 	
     		} else	
     		if(entry.getKey().equals(JSONTag.TAG_TRANSACTION_FEE))
     		{
-    			data.put("setting", "Transaction fee");
-        		data.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
+    			dataPair.put("setting", "Transaction fee");
+        		dataPair.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
 	
     		}else	
     		if(entry.getKey().equals(JSONTag.TAG_TIMEOUT))
     		{
-    			data.put("setting", "Timeout");
-        		data.put("value", entry.getValue() + " minutes");
+    			dataPair.put("setting", "Timeout");
+        		dataPair.put("value", entry.getValue() + " minutes");
 	
     		}else	
     		if(entry.getKey().equals(JSONTag.TAG_VOLUME))
     		{
-    			data.put("setting", "Total paid");
-        		data.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
+    			dataPair.put("setting", "Total paid");
+        		dataPair.put("value", entry.getValue() + " " + faucetHashMap.get(JSONTag.TAG_SHORTNAME));
 	
     		}else	   		
     		if(entry.getKey().equals(JSONTag.TAG_TOTAL_PAYOUTS))
     		{
-    			data.put("setting", "Total payouts");
-        		data.put("value", entry.getValue());
+    			dataPair.put("setting", "Total payouts");
+        		dataPair.put("value", entry.getValue());
 	
     		}else
     		if(entry.getKey().equals(JSONTag.TAG_ALGORITHM))
     		{
-    			data.put("setting", "Algorithm");
-        		data.put("value", entry.getValue());
+    			dataPair.put("setting", "Algorithm");
+        		dataPair.put("value", entry.getValue());
     		}else
     		if(entry.getKey().equals(JSONTag.TAG_HASHRATE))
     		{
-    			data.put("setting", "Hashrate");
-        		data.put("value", entry.getValue() + " MH/s");
+    			dataPair.put("setting", "Hashrate");
+        		dataPair.put("value", entry.getValue() + " MH/s");
     		}else 
     		if(entry.getKey().equals(JSONTag.TAG_DIFFICULTY))
     		{
-    			data.put("setting", "Difficulty");
-        		data.put("value", entry.getValue());
+    			dataPair.put("setting", "Difficulty");
+        		dataPair.put("value", entry.getValue());
     		}else 
     		if(entry.getKey().equals(JSONTag.TAG_BLOCKS))
     		{
-    			data.put("setting", "Blocks");
-        		data.put("value", entry.getValue());
+    			dataPair.put("setting", "Blocks");
+        		dataPair.put("value", entry.getValue());
     		} 		
     		else {
     			continue;
     		}
     		
-    		detailList.add(data);
+    		detailList.add(dataPair);
     	}
     	
     	ListAdapter adapter = new SimpleAdapter(
@@ -188,9 +188,9 @@ public class InfoActivity extends Activity {
     protected void onPause() {
     	// TODO Auto-generated method stub
     	super.onPause();
-    	if(aTask!=null)
+    	if(asyncTask!=null)
     	{
-    		aTask.cancel(true);
+    		asyncTask.cancel(true);
     	}
     }
     
@@ -201,56 +201,55 @@ public class InfoActivity extends Activity {
      */
 	private class GetFaucetDetailsTask extends AsyncTask<Void, Void, Void> {
  
-		String cur_message;
-		int cur_index;
-		int max_index;
-	    private String API_URL = "http://api.altcoinfaucet.net/public";
+		String currentMessage;
+		int currentIndex;
+		int maximumIndex;
+	    private String apiUrl = "http://api.altcoinfaucet.net/public";
 		
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            pDialog = new ProgressDialog(InfoActivity.this);
-            pDialog.setMessage("Initialising...");
-            pDialog.setCancelable(false);
-            pDialog.show();
+            processDialog = new ProgressDialog(InfoActivity.this);
+            processDialog.setMessage("Initialising...");
+            processDialog.setCancelable(false);
+            processDialog.show();
  
         }
  
         @Override
         protected Void doInBackground(Void... arg0) {
         	
-            cur_message = "Processing information ...";
-            cur_index = 0;
-            max_index = 2;
+            currentMessage = "Processing information ...";
+            currentIndex = 0;
+            maximumIndex = 2;
             
             if(isCancelled()) return null;
         	//Update stats
-        	ServiceHandler shDetails = new ServiceHandler();
-            String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + infoFaucet.getName() + "/stats", ServiceHandler.GET);
+        	ServiceHandler httpRequest = new ServiceHandler();
+            String jsonDetails = httpRequest.makeServiceCall(apiUrl + "/faucet/" + infoFaucet.getName() + "/stats", ServiceHandler.GET);
             
             try {
             	if(jsonDetails != null)
             	{
-            		FaucetStats fStats = infoFaucet.getStats();
-            		fStats.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
-            		fStats.save();
+            		FaucetStats faucetStatistics = infoFaucet.getStats();
+            		faucetStatistics.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
+            		faucetStatistics.save();
                 	publishProgress();
             	}
             }catch(Exception e) {}
             
             if(isCancelled()) return null;
         	//Update info
-        	ServiceHandler shInfo = new ServiceHandler();
-        	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + infoFaucet.getName() + "/info", ServiceHandler.GET);
+        	String jsonInfo = httpRequest.makeServiceCall(apiUrl + "/faucet/" + infoFaucet.getName() + "/info", ServiceHandler.GET);
         	
         	try {
             	
             	if(jsonInfo != null)
             	{
-            		FaucetInfo fInfo = infoFaucet.getInfo();
-            		fInfo.fromJSONObject(new JSONArray(jsonInfo).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
-            		fInfo.save();
+            		FaucetInfo faucetInformation = infoFaucet.getInfo();
+            		faucetInformation.fromJSONObject(new JSONArray(jsonInfo).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
+            		faucetInformation.save();
             		publishProgress();
             	}    
         	} catch(Exception e) {}
@@ -264,8 +263,8 @@ public class InfoActivity extends Activity {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+            if (processDialog.isShowing())
+                processDialog.dismiss();
             
             loadDetailListView();
            
@@ -275,8 +274,8 @@ public class InfoActivity extends Activity {
         protected void onProgressUpdate(Void... values) {
         	// TODO Auto-generated method stub
         	super.onProgressUpdate(values);
-        	cur_index++;
-        	pDialog.setMessage(cur_message + String.valueOf(cur_index) + "/" + String.valueOf(max_index));
+        	currentIndex++;
+        	processDialog.setMessage(currentMessage + String.valueOf(currentIndex) + "/" + String.valueOf(maximumIndex));
         }
         
         @Override
@@ -289,7 +288,7 @@ public class InfoActivity extends Activity {
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-		        	pDialog.dismiss();	
+		        	processDialog.dismiss();	
 				}
 			});
         }

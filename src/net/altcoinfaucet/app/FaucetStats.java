@@ -12,7 +12,7 @@ import com.orm.SugarRecord;
 
 public class FaucetStats extends SugarRecord<FaucetStats>{
 
-	private int total_payouts;
+	private int totalPayouts;
 	private double volume;
 	
 	public FaucetStats(Context arg0) {
@@ -23,10 +23,10 @@ public class FaucetStats extends SugarRecord<FaucetStats>{
 	public void fromJSONObject(JSONObject json)
 	{
 		try {
-			this.total_payouts = json.getInt(JSONTag.TAG_TOTAL_PAYOUTS);
+			this.totalPayouts = json.getInt(JSONTag.TAG_TOTAL_PAYOUTS);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			this.total_payouts = 0;
+			this.totalPayouts = 0;
 			e.printStackTrace();
 		}
 		try {
@@ -42,7 +42,7 @@ public class FaucetStats extends SugarRecord<FaucetStats>{
 	{
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		map.put(JSONTag.TAG_VOLUME, String.valueOf(this.volume));
-		map.put(JSONTag.TAG_TOTAL_PAYOUTS, String.valueOf(this.total_payouts));
+		map.put(JSONTag.TAG_TOTAL_PAYOUTS, String.valueOf(this.totalPayouts));
 		
 		return map;
 	}

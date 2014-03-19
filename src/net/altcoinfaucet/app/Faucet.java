@@ -18,33 +18,33 @@ import com.orm.query.Select;
 public class Faucet extends SugarRecord<Faucet>{
 	private int faucetId;
 	private String name;
-	private String shortname;
+	private String shortName;
 	private String slogan;
-	private String donate;
+	private String donationAddress;
 	private double balance;
-	private double min_payout;
-	private double max_payout;
-	private double withdraw_limit;
-	private double transaction_fee;
+	private double minPayout;
+	private double maxPayout;
+	private double withdrawLimit;
+	private double transactionFee;
 	private int timeout;
 	private boolean enabled;
 	private int state;
-	private FaucetStats stats;
-	private FaucetInfo info;
+	private FaucetStats statistics;
+	private FaucetInfo information;
 		
 	
 	 
 	public Faucet(Context ctx) {
 		super(ctx);
 		
-		if(this.stats==null)
+		if(this.statistics==null)
 		{
-			this.stats = new FaucetStats(ctx);
+			this.statistics = new FaucetStats(ctx);
 		}
 		
-		if(this.info == null)
+		if(this.information == null)
 		{
-			this.info = new FaucetInfo(ctx);
+			this.information = new FaucetInfo(ctx);
 		}
 	}
 	
@@ -52,14 +52,14 @@ public class Faucet extends SugarRecord<Faucet>{
 	{
 		this.faucetId = json.getInt(JSONTag.TAG_ID);
 		this.name = json.getString(JSONTag.TAG_NAME).toUpperCase();
-		this.shortname = json.getString(JSONTag.TAG_SHORTNAME);
+		this.shortName = json.getString(JSONTag.TAG_SHORTNAME);
 		this.slogan = json.getString(JSONTag.TAG_SLOGAN);
 		
 		try {
-			this.donate = json.getString(JSONTag.TAG_DONATE);
+			this.donationAddress = json.getString(JSONTag.TAG_DONATE);
 		} catch(Exception e)
 		{
-			this.donate = "";
+			this.donationAddress = "";
 		}
 		
 		try {
@@ -71,33 +71,33 @@ public class Faucet extends SugarRecord<Faucet>{
 		}
 		
 		try {
-			this.min_payout = json.getDouble(JSONTag.TAG_MIN_PAYOUT);
+			this.minPayout = json.getDouble(JSONTag.TAG_MIN_PAYOUT);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			this.min_payout = 0;
+			this.minPayout = 0;
 			e.printStackTrace();
 		}
 		try {
-			this.max_payout = json.getDouble(JSONTag.TAG_MAX_PAYOUT);
+			this.maxPayout = json.getDouble(JSONTag.TAG_MAX_PAYOUT);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			this.max_payout = 0;
-			e.printStackTrace();
-		}
-		
-		try {
-			this.withdraw_limit = json.getDouble(JSONTag.TAG_WITHDRAW_LIMIT);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			this.withdraw_limit =  0;
+			this.maxPayout = 0;
 			e.printStackTrace();
 		}
 		
 		try {
-			this.transaction_fee = json.getDouble(JSONTag.TAG_TRANSACTION_FEE);
+			this.withdrawLimit = json.getDouble(JSONTag.TAG_WITHDRAW_LIMIT);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			this.transaction_fee = 0;
+			this.withdrawLimit =  0;
+			e.printStackTrace();
+		}
+		
+		try {
+			this.transactionFee = json.getDouble(JSONTag.TAG_TRANSACTION_FEE);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			this.transactionFee = 0;
 			e.printStackTrace();
 		}
 		
@@ -115,13 +115,13 @@ public class Faucet extends SugarRecord<Faucet>{
 		map.put(JSONTag.TAG_DB_ID, String.valueOf(this.getId()));
 		map.put(JSONTag.TAG_ID, String.valueOf(this.id));
 		map.put(JSONTag.TAG_NAME, this.name);
-		map.put(JSONTag.TAG_SHORTNAME, this.shortname);
-		map.put(JSONTag.TAG_DONATE,this.donate);
+		map.put(JSONTag.TAG_SHORTNAME, this.shortName);
+		map.put(JSONTag.TAG_DONATE,this.donationAddress);
 		map.put(JSONTag.TAG_BALANCE, String.valueOf(this.balance));
-		map.put(JSONTag.TAG_MIN_PAYOUT, String.valueOf(this.min_payout));
-		map.put(JSONTag.TAG_MAX_PAYOUT, String.valueOf(this.max_payout));
-		map.put(JSONTag.TAG_WITHDRAW_LIMIT, String.valueOf(this.withdraw_limit));
-		map.put(JSONTag.TAG_TRANSACTION_FEE, String.valueOf(this.transaction_fee));
+		map.put(JSONTag.TAG_MIN_PAYOUT, String.valueOf(this.minPayout));
+		map.put(JSONTag.TAG_MAX_PAYOUT, String.valueOf(this.maxPayout));
+		map.put(JSONTag.TAG_WITHDRAW_LIMIT, String.valueOf(this.withdrawLimit));
+		map.put(JSONTag.TAG_TRANSACTION_FEE, String.valueOf(this.transactionFee));
 		map.put(JSONTag.TAG_TIMEOUT, String.valueOf(this.timeout));
 		map.put(JSONTag.TAG_ENABLED, String.valueOf(this.enabled));
 		
@@ -142,8 +142,8 @@ public class Faucet extends SugarRecord<Faucet>{
 		}
 		
 		
-		map.put("list_headline", this.name + " (" + this.shortname + ")" + " - " + "Faucet");
-		map.put("subheading", map.get(JSONTag.TAG_STATE) + ": " + String.valueOf(this.balance) + " " + this.shortname);
+		map.put("list_headline", this.name + " (" + this.shortName + ")" + " - " + "Faucet");
+		map.put("subheading", map.get(JSONTag.TAG_STATE) + ": " + String.valueOf(this.balance) + " " + this.shortName);
 		
 		return map;
  	}
@@ -159,7 +159,7 @@ public class Faucet extends SugarRecord<Faucet>{
 
 	public FaucetStats getStats() {
 		// TODO Auto-generated method stub
-		return this.stats;
+		return this.statistics;
 	}
 
 	public String getName() {
@@ -169,12 +169,12 @@ public class Faucet extends SugarRecord<Faucet>{
 
 	public FaucetInfo getInfo() {
 		// TODO Auto-generated method stub
-		return this.info;
+		return this.information;
 	}
 
 	public String getShortName() {
 		// TODO Auto-generated method stub
-		return this.shortname;
+		return this.shortName;
 	}
 	
 

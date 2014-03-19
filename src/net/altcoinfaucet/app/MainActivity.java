@@ -38,12 +38,12 @@ import android.widget.TextView;
 public class MainActivity extends ListActivity {
 	 
 	
-    private ProgressDialog pDialog;
+    private ProgressDialog processDialog;
  
     ArrayList<HashMap<String, String>> faucetList;
     ListView faucetListView;
     Context mainContext;
-    GetFaucetListTask aTask;
+    GetFaucetListTask asyncTask;
  
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,8 +93,8 @@ public class MainActivity extends ListActivity {
             return true;
             
         case R.id.menu_refresh: //Refresh data
-            aTask = new GetFaucetListTask();
-            aTask.execute();
+            asyncTask = new GetFaucetListTask();
+            asyncTask.execute();
             return true;
             
         default:
@@ -125,8 +125,8 @@ public class MainActivity extends ListActivity {
     protected void onPause() {
     	// TODO Auto-generated method stub
     	super.onPause();
-    	if(aTask!=null) {
-	    	aTask.cancel(true);
+    	if(asyncTask!=null) {
+	    	asyncTask.cancel(true);
     	}
     }
     
@@ -145,27 +145,27 @@ public class MainActivity extends ListActivity {
      */
 	private class GetFaucetListTask extends AsyncTask<Void, Void, Void> {
  
-		private String cur_message;
-		private int cur_index;
-		private int max_index;
-	    private String API_URL = "http://api.altcoinfaucet.net/public";
+		private String currentMessage;
+		private int currentIndex;
+		private int maximumIndex;
+	    private String apiUrl = "http://api.altcoinfaucet.net/public";
         
 		
 		@Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            pDialog = new ProgressDialog(MainActivity.this);
-            pDialog.setMessage("Initialising...");
-            pDialog.setCancelable(false);
-            pDialog.show();
+            processDialog = new ProgressDialog(MainActivity.this);
+            processDialog.setMessage("Initialising...");
+            processDialog.setCancelable(false);
+            processDialog.show();
         }
  
         @Override
         protected Void doInBackground(Void... arg0) {
         	
-            ServiceHandler sh = new ServiceHandler();
-            String jsonStr = sh.makeServiceCall(API_URL + "/faucets", ServiceHandler.GET);
+            ServiceHandler httpRequest = new ServiceHandler();
+            String jsonStr = httpRequest.makeServiceCall(apiUrl + "/faucets", ServiceHandler.GET);
             
  
             if (jsonStr == null) {
@@ -186,52 +186,50 @@ public class MainActivity extends ListActivity {
                 
                 faucetList.clear();
                 
-                cur_message = "Processing information ...";
-                cur_index = 0;
-                max_index = faucetArray.length()*3;
+                currentMessage = "Processing information ...";
+                currentIndex = 0;
+                maximumIndex = faucetArray.length()*3;
                 
                 for(int i = 0; i < faucetArray.length(); i++) //
                 {
                     
                 	if(isCancelled()) return null;
-                	JSONObject faucetObj = faucetArray.getJSONObject(i);
+                	JSONObject jsonFaucet = faucetArray.getJSONObject(i);
                 	
                 	//Update if possible;
-                	Faucet faucet = Faucet.findByFaucetId((long)faucetObj.getInt(JSONTag.TAG_ID));
+                	Faucet faucet = Faucet.findByFaucetId((long)jsonFaucet.getInt(JSONTag.TAG_ID));
                 	if(faucet == null){
                 		faucet = new Faucet(mainContext);
                 	}
                 	
-                	faucet.fromJSONObj(faucetObj);
+                	faucet.fromJSONObj(jsonFaucet);
                 	
                 	if(isCancelled()) return null;
                 	
                 	//Update stats
-                	ServiceHandler shDetails = new ServiceHandler();
-                    String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + faucet.getName() + "/stats", ServiceHandler.GET);
+                    String jsonDetails = httpRequest.makeServiceCall(apiUrl + "/faucet/" + faucet.getName() + "/stats", ServiceHandler.GET);
                     
                     try {
 	                	if(jsonDetails != null)
 	                	{
-	                		FaucetStats fStats = faucet.getStats();
-	                		fStats.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
-	                		fStats.save();
+	                		FaucetStats faucetStatistics = faucet.getStats();
+	                		faucetStatistics.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
+	                		faucetStatistics.save();
 	                    	publishProgress();
 	                	}
                     }catch(Exception e) {}
                     
                     if(isCancelled()) return null;
                     //Update info
-                	ServiceHandler shInfo = new ServiceHandler();
-                	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + faucet.getName() + "/info", ServiceHandler.GET);
+                	String jsonInformation = httpRequest.makeServiceCall(apiUrl + "/faucet/" + faucet.getName() + "/info", ServiceHandler.GET);
                 	
                 	try {
 	                	
-	                	if(jsonInfo != null)
+	                	if(jsonInformation != null)
 	                	{
-	                		FaucetInfo fInfo = faucet.getInfo();
-	                		fInfo.fromJSONObject(new JSONArray(jsonInfo).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
-	                		fInfo.save();
+	                		FaucetInfo faucetInformation = faucet.getInfo();
+	                		faucetInformation.fromJSONObject(new JSONArray(jsonInformation).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
+	                		faucetInformation.save();
 	                		publishProgress();
 	                	}    
                 	} catch(Exception e) {}
@@ -253,8 +251,8 @@ public class MainActivity extends ListActivity {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+            if (processDialog.isShowing())
+                processDialog.dismiss();
             loadFromDatabase();
         }
         
@@ -262,21 +260,21 @@ public class MainActivity extends ListActivity {
         protected void onProgressUpdate(Void... values) {
         	// TODO Auto-generated method stub
         	super.onProgressUpdate(values);
-        	cur_index++;
-        	pDialog.setMessage(cur_message + String.valueOf(cur_index) + "/" + String.valueOf(max_index));
+        	currentIndex++;
+        	processDialog.setMessage(currentMessage + String.valueOf(currentIndex) + "/" + String.valueOf(maximumIndex));
         }
         
         @Override
         protected void onCancelled() {
         	// TODO Auto-generated method stub
         	super.onCancelled();
-        	Handler h = new Handler(mainContext.getMainLooper());
-        	h.post(new Runnable() {
+        	Handler handler = new Handler(mainContext.getMainLooper());
+        	handler.post(new Runnable() {
 				
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-		        	pDialog.dismiss();	
+		        	processDialog.dismiss();	
 				}
 			});
         }
