@@ -11,6 +11,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
@@ -31,21 +32,14 @@ public class Faucet extends SugarRecord<Faucet>{
 	private int state;
 	private FaucetStats statistics;
 	private FaucetInfo information;
-		
+	
+	@Ignore
+	private Context ctx;
 	
 	 
 	public Faucet(Context ctx) {
 		super(ctx);
-		
-		if(this.statistics==null)
-		{
-			this.statistics = new FaucetStats(ctx);
-		}
-		
-		if(this.information == null)
-		{
-			this.information = new FaucetInfo(ctx);
-		}
+		this.ctx = ctx;
 	}
 	
 	public void fromJSONObj(JSONObject json) throws JSONException
@@ -159,19 +153,28 @@ public class Faucet extends SugarRecord<Faucet>{
 
 	public FaucetStats getStats() {
 		// TODO Auto-generated method stub
+		if(this.statistics == null)
+		{
+			this.statistics = new FaucetStats(this.ctx);
+		}
+		
 		return this.statistics;
+	}
+
+	public FaucetInfo getInfo() {
+		// TODO Auto-generated method stub
+		if(this.information == null)
+		{
+			this.information = new FaucetInfo(this.ctx);
+		}
+		return this.information;
 	}
 
 	public String getName() {
 		// TODO Auto-generated method stub
 		return this.name;
 	}
-
-	public FaucetInfo getInfo() {
-		// TODO Auto-generated method stub
-		return this.information;
-	}
-
+	
 	public String getShortName() {
 		// TODO Auto-generated method stub
 		return this.shortName;

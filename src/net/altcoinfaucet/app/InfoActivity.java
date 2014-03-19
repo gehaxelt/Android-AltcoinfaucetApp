@@ -79,7 +79,6 @@ public class InfoActivity extends Activity {
         case R.id.menu_refresh: //Refresh data
         	asyncTask = new GetFaucetDetailsTask();
         	asyncTask.execute();
-        	asyncTask = null;
             return true;
             
         default:
@@ -288,6 +287,7 @@ public class InfoActivity extends Activity {
         	super.onProgressUpdate(values);
         	currentIndex++;
         	processDialog.setMessage(currentMessage + String.valueOf(currentIndex) + "/" + String.valueOf(maximumIndex));
+        	
         }
         
         @Override
@@ -304,6 +304,8 @@ public class InfoActivity extends Activity {
 				}
 			});
         }
+        
+        
         
         
 	}

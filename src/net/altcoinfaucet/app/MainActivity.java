@@ -162,7 +162,7 @@ public class MainActivity extends ListActivity {
         	
             ServiceHandler httpRequest = new ServiceHandler();
             String jsonStr = httpRequest.makeServiceCall(apiUrl + "/faucets", ServiceHandler.GET);
-            
+            Log.d("fooo","bar");
  
             if (jsonStr == null) {
             	 Log.e("ServiceHandler", "Couldn't get any data from the url");
@@ -184,7 +184,7 @@ public class MainActivity extends ListActivity {
                 
                 currentMessage = "Processing information ...";
                 currentIndex = 0;
-                maximumIndex = faucetArray.length()*3;
+                maximumIndex = faucetArray.length();
                 
                 for(int i = 0; i < faucetArray.length(); i++) //
                 {
@@ -199,36 +199,6 @@ public class MainActivity extends ListActivity {
                 	}
                 	
                 	faucet.fromJSONObj(jsonFaucet);
-                	
-                	if(isCancelled()) return null;
-                	
-                	//Update stats
-                    String jsonDetails = httpRequest.makeServiceCall(apiUrl + "/faucet/" + faucet.getName() + "/stats", ServiceHandler.GET);
-                    
-                    try {
-	                	if(jsonDetails != null)
-	                	{
-	                		FaucetStats faucetStatistics = faucet.getStats();
-	                		faucetStatistics.fromJSONObject(new JSONArray(jsonDetails).getJSONObject(0) );
-	                		faucetStatistics.save();
-	                    	publishProgress();
-	                	}
-                    }catch(Exception e) {}
-                    
-                    if(isCancelled()) return null;
-                    //Update info
-                	String jsonInformation = httpRequest.makeServiceCall(apiUrl + "/faucet/" + faucet.getName() + "/info", ServiceHandler.GET);
-                	
-                	try {
-	                	
-	                	if(jsonInformation != null)
-	                	{
-	                		FaucetInfo faucetInformation = faucet.getInfo();
-	                		faucetInformation.fromJSONObject(new JSONArray(jsonInformation).getJSONObject(0).getJSONObject(JSONTag.TAG_INFORMATION));
-	                		faucetInformation.save();
-	                		publishProgress();
-	                	}    
-                	} catch(Exception e) {}
 
                 	faucet.save();
                     faucetList.add(faucet.toLinkedHashMap());
