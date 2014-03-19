@@ -11,11 +11,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.R.string;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.DropBoxManager.Entry;
 import android.util.Log;
 import android.view.Menu;
@@ -32,6 +35,7 @@ public class InfoActivity extends Activity {
 	ListView detailListView;
 	ArrayList<HashMap<String, String>> detailList;
 	ProgressDialog pDialog;
+	GetFaucetDetailsTask aTask;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,8 @@ public class InfoActivity extends Activity {
         return true;
     }
     
-    @Override
+    @SuppressLint("NewApi")
+	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	
         switch (item.getItemId()) {
@@ -72,7 +77,9 @@ public class InfoActivity extends Activity {
             return true;
             
         case R.id.menu_refresh: //Refresh data
-        	new GetFaucetDetailsTask().execute();
+        	aTask = new GetFaucetDetailsTask();
+        	aTask.execute();
+        	aTask = null;
             return true;
             
         default:
@@ -177,6 +184,15 @@ public class InfoActivity extends Activity {
        detailListView.setAdapter(adapter);
     }
     
+    @Override
+    protected void onPause() {
+    	// TODO Auto-generated method stub
+    	super.onPause();
+    	if(aTask!=null)
+    	{
+    		aTask.cancel(true);
+    	}
+    }
     
     /**
      * AsyncTask to load data
@@ -207,7 +223,8 @@ public class InfoActivity extends Activity {
             cur_message = "Processing information ...";
             cur_index = 0;
             max_index = 2;
-                	
+            
+            if(isCancelled()) return null;
         	//Update stats
         	ServiceHandler shDetails = new ServiceHandler();
             String jsonDetails = shDetails.makeServiceCall(API_URL + "/faucet/" + infoFaucet.getName() + "/stats", ServiceHandler.GET);
@@ -222,6 +239,7 @@ public class InfoActivity extends Activity {
             	}
             }catch(Exception e) {}
             
+            if(isCancelled()) return null;
         	//Update info
         	ServiceHandler shInfo = new ServiceHandler();
         	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + infoFaucet.getName() + "/info", ServiceHandler.GET);
@@ -260,6 +278,22 @@ public class InfoActivity extends Activity {
         	cur_index++;
         	pDialog.setMessage(cur_message + String.valueOf(cur_index) + "/" + String.valueOf(max_index));
         }
- 
-    }
+        
+        @Override
+        protected void onCancelled() {
+        	// TODO Auto-generated method stub
+        	super.onCancelled();
+        	Handler h = new Handler(infoContext.getMainLooper());
+        	h.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+		        	pDialog.dismiss();	
+				}
+			});
+        }
+        
+        
+	}
 }

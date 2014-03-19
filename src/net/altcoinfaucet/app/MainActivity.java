@@ -11,13 +11,17 @@ import org.json.JSONObject;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,10 +43,11 @@ public class MainActivity extends ListActivity {
     ArrayList<HashMap<String, String>> faucetList;
     ListView faucetListView;
     Context mainContext;
+    GetFaucetListTask aTask;
  
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    	super.onCreate(savedInstanceState);
         mainContext = this.getBaseContext();
         
         setContentView(R.layout.activity_main);
@@ -54,7 +59,7 @@ public class MainActivity extends ListActivity {
 //	    Faucet.deleteAll(Faucet.class);
 //	    FaucetStats.deleteAll(FaucetStats.class);
 //	    FaucetInfo.deleteAll(FaucetInfo.class);
-//	    
+	    
         this.loadFromDatabase();
         
         faucetListView.setOnItemClickListener(new OnItemClickListener() {
@@ -72,7 +77,7 @@ public class MainActivity extends ListActivity {
 			}
 		});
     }
-
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
@@ -88,7 +93,8 @@ public class MainActivity extends ListActivity {
             return true;
             
         case R.id.menu_refresh: //Refresh data
-            new GetFaucetListTask().execute();
+            aTask = new GetFaucetListTask();
+            aTask.execute();
             return true;
             
         default:
@@ -115,6 +121,21 @@ public class MainActivity extends ListActivity {
        setListAdapter(adapter);
     }
     
+    @Override
+    protected void onPause() {
+    	// TODO Auto-generated method stub
+    	super.onPause();
+    	if(aTask!=null) {
+	    	aTask.cancel(true);
+    	}
+    }
+    
+    @Override
+    protected void onResume() {
+    	// TODO Auto-generated method stub
+    	super.onResume();
+    	this.loadFromDatabase();
+    }
     
     
     /**
@@ -124,12 +145,13 @@ public class MainActivity extends ListActivity {
      */
 	private class GetFaucetListTask extends AsyncTask<Void, Void, Void> {
  
-		String cur_message;
-		int cur_index;
-		int max_index;
+		private String cur_message;
+		private int cur_index;
+		private int max_index;
 	    private String API_URL = "http://api.altcoinfaucet.net/public";
+        
 		
-        @Override
+		@Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
@@ -137,7 +159,6 @@ public class MainActivity extends ListActivity {
             pDialog.setMessage("Initialising...");
             pDialog.setCancelable(false);
             pDialog.show();
- 
         }
  
         @Override
@@ -171,6 +192,8 @@ public class MainActivity extends ListActivity {
                 
                 for(int i = 0; i < faucetArray.length(); i++) //
                 {
+                    
+                	if(isCancelled()) return null;
                 	JSONObject faucetObj = faucetArray.getJSONObject(i);
                 	
                 	//Update if possible;
@@ -180,6 +203,8 @@ public class MainActivity extends ListActivity {
                 	}
                 	
                 	faucet.fromJSONObj(faucetObj);
+                	
+                	if(isCancelled()) return null;
                 	
                 	//Update stats
                 	ServiceHandler shDetails = new ServiceHandler();
@@ -195,7 +220,8 @@ public class MainActivity extends ListActivity {
 	                	}
                     }catch(Exception e) {}
                     
-                	//Update info
+                    if(isCancelled()) return null;
+                    //Update info
                 	ServiceHandler shInfo = new ServiceHandler();
                 	String jsonInfo = shInfo.makeServiceCall(API_URL + "/faucet/" + faucet.getName() + "/info", ServiceHandler.GET);
                 	
@@ -238,6 +264,21 @@ public class MainActivity extends ListActivity {
         	super.onProgressUpdate(values);
         	cur_index++;
         	pDialog.setMessage(cur_message + String.valueOf(cur_index) + "/" + String.valueOf(max_index));
+        }
+        
+        @Override
+        protected void onCancelled() {
+        	// TODO Auto-generated method stub
+        	super.onCancelled();
+        	Handler h = new Handler(mainContext.getMainLooper());
+        	h.post(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+		        	pDialog.dismiss();	
+				}
+			});
         }
  
     }
